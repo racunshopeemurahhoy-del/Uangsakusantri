@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Pencatatan Uang Saku Santri</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--success-color), #27ae60);
+            color: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .balance-card h2 {
+            font-size: 1rem;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .balance-card .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-section input, .form-section select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-section input:focus, .form-section select:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-add:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-reset {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: var(--shadow);
+            margin-top: 10px;
+        }
+        
+        .btn-reset:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .history-section {
+            text-align: left;
+        }
+
+        .history-section h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        #transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            border-left: 5px solid;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .transaction-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .transaction-item.income {
+            border-left-color: var(--success-color);
+        }
+
+        .transaction-item.expense {
+            border-left-color: var(--danger-color);
+        }
+
+        .transaction-info {
+            flex-grow: 1;
+        }
+
+        .transaction-info .description {
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .transaction-info .date {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .transaction-amount.income {
+            color: var(--success-color);
+        }
+
+        .transaction-amount.expense {
+            color: var(--danger-color);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        #amount-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        #amount {
+            display: none;
+        }
+        
+        /* Modal Date Picker Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .nav-btn {
+            background: var(--bg-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: #e2eaf0;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day, .calendar-day-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day-header {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .calendar-day {
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--bg-color);
+        }
+        
+        .calendar-day.selected {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 700;
+        }
+        
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .modal-close-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        /* Modal untuk nama anak */
+        #name-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        #name-modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        #name-modal-content h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        #child-name-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        
+        #save-name-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .collapsible-header {
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        .collapsible-header::after {
+            content: '+';
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+        }
+        .collapsible-header.active::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+        
+        .report-content {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-radius: 12px;
+            margin-top: 10px;
+            display: none;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.8rem;
+        }
+        .data-table th {
+            background-color: #eee;
+        }
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .copy-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Modal untuk Nama Santri -->
+<div id="name-modal">
+    <div id="name-modal-content">
+        <h3>Halo, Santri!</h3>
+        <p>Silakan masukkan nama Anda untuk memulai pencatatan uang saku.</p>
+        <input type="text" id="child-name-input" placeholder="Nama Santri">
+        <button id="save-name-btn">Mulai</button>
+    </div>
+</div>
+
+<div class="container" style="display: none;">
+    <h1 id="app-title">Pencatatan Uang Saku Santri</h1>
+    <p>Catat pemasukan & pengeluaran harianmu.</p>
+
+    <div class="balance-card">
+        <h2>Saldo Saat Ini</h2>
+        <div class="balance-amount" id="balance-amount">Rp 0</div>
+    </div>
+
+    <div class="form-section">
+        <select id="transaction-type" name="type">
+            <option value="income">Pemasukan (+)</option>
+            <option value="expense">Pengeluaran (-)</option>
+        </select>
+        <input type="text" id="description" placeholder="Deskripsi (contoh: Uang jajan, Beli buku)">
+        
+        <div id="date-picker-trigger" onclick="openDatePicker()">
+            <span id="display-date">Hari Ini</span>
+            <button>Pilih Tanggal</button>
+        </div>
+        
+        <div id="amount-input-group">
+            <select id="nominal-select" onchange="toggleAmountInput()">
+                <option value="" disabled selected>Pilih nominal uang</option>
+                <option value="1000">Rp 1.000</option>
+                <option value="2500">Rp 2.500</option>
+                <option value="5000">Rp 5.000</option>
+                <option value="10000">Rp 10.000</option>
+                <option value="20000">Rp 20.000</option>
+                <option value="50000">Rp 50.000</option>
+                <option value="other">Lainnya...</option>
+            </select>
+            <input type="number" id="amount" placeholder="Jumlah (contoh: 5000)">
+        </div>
+        <button class="btn-add" onclick="addTransaction()">Tambah Transaksi</button>
+        <button class="btn-reset" onclick="resetData()">Reset Data</button>
+    </div>
+
+    <div class="history-section">
+        <h3>Riwayat Transaksi</h3>
+        <ul id="transaction-list">
+            <!-- Transaksi akan ditambahkan di sini oleh JavaScript -->
+        </ul>
+    </div>
+    
+    <div class="collapsible-header" id="report-header">
+        Laporan Data
+    </div>
+    <div class="report-content" id="report-content">
+        <p>Anda bisa menyalin data di bawah ini untuk ditempel ke spreadsheet seperti Google Sheets atau Microsoft Excel.</p>
+        <button class="copy-button" onclick="copyReport()">Salin Laporan</button>
+        <pre id="report-data-csv" style="white-space: pre-wrap; font-family: monospace; font-size: 0.9rem; margin-top: 10px;"></pre>
+    </div>
+</div>
+
+<!-- Pop-up Kalender -->
+<div id="date-picker-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="nav-btn" onclick="prevMonth()"><</button>
+            <h4 id="month-year-display"></h4>
+            <button class="nav-btn" onclick="nextMonth()">></button>
+        </div>
+        <div class="calendar-grid" id="calendar-grid">
+            <div class="calendar-day-header">Sen</div>
+            <div class="calendar-day-header">Sel</div>
+            <div class="calendar-day-header">Rab</div>
+            <div class="calendar-day-header">Kam</div>
+            <div class="calendar-day-header">Jum</div>
+            <div class="calendar-day-header">Sab</div>
+            <div class="calendar-day-header">Min</div>
+            <!-- Tanggal akan di-generate di sini oleh JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedName = localStorage.getItem('childName');
+        if (savedName) {
+            document.getElementById('page-title').textContent = `Pencatatan Uang Saku Harian ${savedName}`;
+            document.getElementById('app-title').textContent = `Pencatatan Uang Saku Harian ${savedName}`;
+            document.querySelector('.container').style.display = 'block';
+            loadTransactions();
+        } else {
+            document.getElementById('name-modal').style.display = 'flex';
+            document.getElementById('save-name-btn').addEventListener('click', () => {
+                const nameInput = document.getElementById('child-name-input').value;
+                if (nameInput) {
+                    localStorage.setItem('childName', nameInput);
+                    document.getElementById('page-title').textContent = `Pencatatan Uang Saku Harian ${nameInput}`;
+                    document.getElementById('app-title').textContent = `Pencatatan Uang Saku Harian ${nameInput}`;
+                    document.querySelector('.container').style.display = 'block';
+                    document.getElementById('name-modal').style.display = 'none';
+                    loadTransactions();
+                }
+            });
+        }
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+        updateDisplayDate();
+    });
+
+    let transactions = [];
+    let currentDate = new Date();
+    let selectedDate = new Date();
+
+    function saveTransactions() {
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    function loadTransactions() {
+        const storedTransactions = localStorage.getItem('transactions');
+        if (storedTransactions) {
+            transactions = JSON.parse(storedTransactions);
+            updateUI();
+            generateReport();
+        }
+    }
+    
+    function updateUI() {
+        const balanceAmount = document.getElementById('balance-amount');
+        const transactionList = document.getElementById('transaction-list');
+        
+        transactionList.innerHTML = '';
+        let balance = 0;
+
+        transactions.forEach(transaction => {
+            if (transaction.type === 'income') {
+                balance += transaction.amount;
+            } else {
+                balance -= transaction.amount;
+            }
+
+            const item = document.createElement('li');
+            item.classList.add('transaction-item', transaction.type);
+            
+            item.innerHTML = `
+                <div class="transaction-info">
+                    <div class="description">${transaction.description}</div>
+                    <div class="date">${transaction.date}</div>
+                </div>
+                <div class="transaction-amount ${transaction.type}">${formatCurrency(transaction.amount)}</div>
+                <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">×</button>
+            `;
+            
+            transactionList.appendChild(item);
+        });
+
+        balanceAmount.textContent = formatCurrency(balance);
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(amount);
+    }
+
+    window.toggleAmountInput = function() {
+        const nominalSelect = document.getElementById('nominal-select');
+        const amountInput = document.getElementById('amount');
+        if (nominalSelect.value === 'other') {
+            amountInput.style.display = 'block';
+        } else {
+            amountInput.style.display = 'none';
+        }
+    }
+
+    window.updateDisplayDate = function() {
+        const displayDate = document.getElementById('display-date');
+        const today = new Date();
+        if (selectedDate.toLocaleDateString() === today.toLocaleDateString()) {
+            displayDate.textContent = "Hari Ini";
+        } else {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            displayDate.textContent = selectedDate.toLocaleDateString('id-ID', options);
+        }
+    }
+
+    window.openDatePicker = function() {
+        document.getElementById('date-picker-modal').classList.add('visible');
+    }
+    
+    window.closeDatePicker = function() {
+        document.getElementById('date-picker-modal').classList.remove('visible');
+    }
+
+    window.addTransaction = function() {
+        const type = document.getElementById('transaction-type').value;
+        const description = document.getElementById('description').value;
+        const nominalSelect = document.getElementById('nominal-select').value;
+        const amountInput = document.getElementById('amount').value;
+
+        let amount;
+        if (nominalSelect === 'other') {
+            amount = parseFloat(amountInput);
+        } else {
+            amount = parseFloat(nominalSelect);
+        }
+
+        if (!description || !amount || isNaN(amount)) {
+            const container = document.querySelector('.container');
+            const message = document.createElement('div');
+            message.textContent = 'Harap isi semua kolom dengan benar!';
+            message.style.cssText = 'background-color: var(--danger-color); color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px;';
+            container.insertBefore(message, container.firstChild);
+            setTimeout(() => message.remove(), 3000);
+            return;
+        }
+
+        const transaction = {
+            id: Date.now(),
+            type,
+            description,
+            amount,
+            date: selectedDate.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' }),
+            timestamp: Date.now()
+        };
+
+        transactions.unshift(transaction);
+        saveTransactions();
+        updateUI();
+        generateReport();
+
+        document.getElementById('description').value = '';
+        document.getElementById('amount').value = '';
+        document.getElementById('nominal-select').value = '';
+        document.getElementById('amount').style.display = 'none';
+        selectedDate = new Date();
+        updateDisplayDate();
+    }
+
+    window.deleteTransaction = function(id) {
+        const confirmDelete = document.createElement('div');
+        confirmDelete.innerHTML = `
+            <div style="background-color: #e74c3c; color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
+                <button id="confirm-yes" style="background-color: var(--success-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 10px; cursor: pointer;">Ya</button>
+                <button id="confirm-no" style="background-color: var(--secondary-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Tidak</button>
+            </div>
+        `;
+        const formSection = document.querySelector('.form-section');
+        formSection.parentNode.insertBefore(confirmDelete, formSection);
+
+        document.getElementById('confirm-yes').addEventListener('click', () => {
+            transactions = transactions.filter(tx => tx.id !== id);
+            saveTransactions();
+            updateUI();
+            generateReport();
+            confirmDelete.remove();
+        });
+
+        document.getElementById('confirm-no').addEventListener('click', () => {
+            confirmDelete.remove();
+        });
+    }
+
+    window.resetData = function() {
+        const confirmReset = document.createElement('div');
+        confirmReset.innerHTML = `
+            <div style="background-color: #f39c12; color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p>Apakah Anda yakin ingin menghapus semua data? Ini tidak dapat diurungkan!</p>
+                <button id="confirm-yes" style="background-color: var(--success-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; margin-right: 10px; cursor: pointer;">Ya</button>
+                <button id="confirm-no" style="background-color: var(--danger-color); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer;">Tidak</button>
+            </div>
+        `;
+        const formSection = document.querySelector('.form-section');
+        formSection.parentNode.insertBefore(confirmReset, formSection);
+
+        document.getElementById('confirm-yes').addEventListener('click', () => {
+            localStorage.removeItem('transactions');
+            transactions = [];
+            updateUI();
+            generateReport();
+            confirmReset.remove();
+        });
+
+        document.getElementById('confirm-no').addEventListener('click', () => {
+            confirmReset.remove();
+        });
+    }
+
+    // --- Logika Kalender ---
+    window.renderCalendar = function(year, month) {
+        const monthYearDisplay = document.getElementById('month-year-display');
+        const calendarGrid = document.getElementById('calendar-grid');
+        
+        calendarGrid.innerHTML = '';
+        
+        const daysOfWeek = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+        daysOfWeek.forEach(day => {
+            const header = document.createElement('div');
+            header.classList.add('calendar-day-header');
+            header.textContent = day;
+            calendarGrid.appendChild(header);
+        });
+
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const firstDayIndex = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+        
+        for (let i = 0; i < firstDayIndex; i++) {
+            const emptyDay = document.createElement('div');
+            calendarGrid.appendChild(emptyDay);
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('calendar-day');
+            dayElement.textContent = day;
+            
+            const isSelected = selectedDate.getFullYear() === year && selectedDate.getMonth() === month && selectedDate.getDate() === day;
+            if (isSelected) {
+                dayElement.classList.add('selected');
+            }
+            
+            dayElement.onclick = () => {
+                selectedDate = new Date(year, month, day);
+                updateDisplayDate();
+                closeDatePicker();
+            };
+            
+            calendarGrid.appendChild(dayElement);
+        }
+        
+        const monthName = new Date(year, month).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        monthYearDisplay.textContent = monthName;
+    }
+    
+    window.prevMonth = function() {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    }
+    
+    window.nextMonth = function() {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar(currentDate.getFullYear(), currentDate.getMonth());
+    }
+    
+    const reportHeader = document.getElementById('report-header');
+    const reportContent = document.getElementById('report-content');
+    
+    reportHeader.addEventListener('click', () => {
+        if (reportContent.style.display === 'block') {
+            reportContent.style.display = 'none';
+            reportHeader.classList.remove('active');
+        } else {
+            reportContent.style.display = 'block';
+            reportHeader.classList.add('active');
+            generateReport();
+        }
+    });
+
+    function generateReport() {
+        const reportData = transactions.map(tx => ({
+            tanggal: tx.date,
+            tipe: tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
+            deskripsi: tx.description,
+            jumlah: tx.amount,
+            tanggalWaktuPencatatan: tx.timestamp ? new Date(tx.timestamp).toLocaleString('id-ID') : 'N/A'
+        }));
+        
+        const headers = ['Tanggal', 'Tipe', 'Deskripsi', 'Jumlah', 'Tanggal Waktu Pencatatan'];
+        const csvRows = [
+            headers.join(','),
+            ...reportData.map(row => headers.map(header => {
+                const value = row[header.toLowerCase().replace(/\s/g, '')] || '';
+                return `"${value.toString().replace(/"/g, '""')}"`;
+            }).join(','))
+        ];
+        document.getElementById('report-data-csv').textContent = csvRows.join('\n');
+    }
+
+    window.copyReport = function() {
+        const reportText = document.getElementById('report-data-csv').textContent;
+        const textarea = document.createElement('textarea');
+        textarea.value = reportText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Laporan berhasil disalin! Anda bisa menempelkannya di spreadsheet seperti Google Sheets atau Microsoft Excel.');
+    }
+</script>
+</body>
+</html>
+
